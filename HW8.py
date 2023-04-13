@@ -17,18 +17,20 @@ def load_rest_data(db):
     """
     outer_names = {}
     #initialize cursor and connection 
-    conn = sqlite3.connect('{db}.sqlite3')
-    cur = conn.cursor
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
     
-    restaurants = cur.execute('SELECT * FROM resturants').fetchall()
+    restaurants = cur.execute('SELECT restaurants.name, categories.category, buildings.building, restaurants.rating\
+                              FROM restaurants,categories,buildings\
+                              WHERE restaurants.category_id = categories.id\
+                              AND restaurants.building_id = buildings.id').fetchall()
 
+    
     for row in restaurants:  
         inner_info = {} 
-        #creating inner dictionary
-        for row in restaurants:
-            inner_info["category"] = cur.execute('SELECT category FROM categories WHERE categories.category_id = ?', row[2])
-            inner_info["building"] = cur.execute('SELECT building FROM buildings WHERE buildings.building_id = ?', row[3])
-            inner_info["rating"]   = row[4]
+        inner_info["category"] =  row[1]
+        inner_info["building"] =  row[2]
+        inner_info["rating"]   = row[3]
         
         outer_names[row[0]] = inner_info
     
@@ -40,7 +42,36 @@ def plot_rest_categories(db):
     restaurant categories and the values should be the number of restaurants in each category. The function should
     also create a bar chart with restaurant categories and the count of number of restaurants in each category.
     """
-    pass
+    conn = sqlite3.connect(db) 
+    cur = conn.cursor()
+
+    #create dictionary 
+    category_count = {}
+    info = cur.execute('SELECT categories.category, COUNT(restaurants.category_id) FROM categories JOIN restaurants\
+                        ON restaurants.category_id = categories.id\
+                        GROUP BY category').fetchall()
+    
+    cat_dict = dict(info)
+    print(cat_dict)
+    
+    #make visualization
+    num = []
+    cats = []
+    for k,v in cat_dict.items():
+        num.append(v)
+        cats.append(k)
+ 
+
+    plt.barh(cats,num, align = 'center')
+    plt.title('Types of Restaurant on South University Ave')
+    plt.xlabel('Number of Restaurants')
+    plt.ylabel('Restaurant categories')
+    plt.show()
+
+    return cat_dict
+  
+
+
 
 def find_rest_in_building(building_num, db):
     '''
@@ -48,6 +79,7 @@ def find_rest_in_building(building_num, db):
     restaurant names. You need to find all the restaurant names which are in the specific building. The restaurants 
     should be sorted by their rating from highest to lowest.
     '''
+
     pass
 
 #EXTRA CREDIT
