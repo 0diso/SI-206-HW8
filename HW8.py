@@ -46,26 +46,26 @@ def plot_rest_categories(db):
     cur = conn.cursor()
 
     #create dictionary 
-    category_count = {}
     info = cur.execute('SELECT categories.category, COUNT(restaurants.category_id) FROM categories JOIN restaurants\
                         ON restaurants.category_id = categories.id\
                         GROUP BY category').fetchall()
     
+
     cat_dict = dict(info)
-    print(cat_dict)
+    nums =  sorted(cat_dict.items(), key = lambda x: x[1])
+    num_list = []
+    cat_list = []
+
+    for i in nums:
+        cat_list.append(i[0])
+        num_list.append(i[1])
     
     #make visualization
-    num = []
-    cats = []
-    for k,v in cat_dict.items():
-        num.append(v)
-        cats.append(k)
- 
-
-    plt.barh(cats,num, align = 'center')
+    plt.barh(cat_list,num_list, align = 'center')
     plt.title('Types of Restaurant on South University Ave')
     plt.xlabel('Number of Restaurants')
     plt.ylabel('Restaurant categories')
+    plt.xticks([1,2,3,4])
     plt.show()
 
     return cat_dict
@@ -79,8 +79,27 @@ def find_rest_in_building(building_num, db):
     restaurant names. You need to find all the restaurant names which are in the specific building. The restaurants 
     should be sorted by their rating from highest to lowest.
     '''
+    conn = sqlite3.connect(db) 
+    cur = conn.cursor()
+    info = cur.execute('SELECT restaurants.name, restaurants.rating\
+                 FROM restaurants JOIN buildings ON restaurants.building_id = buildings.id\
+                 WHERE buildings.id = ?\
+                 ORDER BY restaurants.rating DESC', (building_num,)).fetchall()
+    
+    name_list = []
+    for row in info:
+       name_list.append(row[0])
+    
+    print(name_list)
+    return name_list
 
-    pass
+    
+    
+
+    
+
+ 
+
 
 #EXTRA CREDIT
 def get_highest_rating(db): #Do this through DB as well
