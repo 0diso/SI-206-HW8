@@ -1,7 +1,7 @@
 # Your name: Odiso Obiora
 # Your student id: 60487933
 # Your email: oobiora@umich.edu
-# List who you have worked with on this homework:
+# List who you have worked with on this homework: N/A
 
 import matplotlib.pyplot as plt
 import os
@@ -81,16 +81,16 @@ def find_rest_in_building(building_num, db):
     '''
     conn = sqlite3.connect(db) 
     cur = conn.cursor()
-    info = cur.execute('SELECT restaurants.name, restaurants.rating\
-                 FROM restaurants JOIN buildings ON restaurants.building_id = buildings.id\
-                 WHERE buildings.id = ?\
-                 ORDER BY restaurants.rating DESC', (building_num,)).fetchall()
+    cur.execute('''SELECT restaurants.name, restaurants.rating
+                 FROM restaurants JOIN buildings ON restaurants.building_id = buildings.id
+                 WHERE buildings.building = ?
+                 ORDER BY restaurants.rating DESC''', (building_num,))
     
+    info = cur.fetchall()
     name_list = []
     for row in info:
        name_list.append(row[0])
     
-    print(name_list)
     return name_list
 
     
